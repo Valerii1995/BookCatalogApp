@@ -1,6 +1,7 @@
 ﻿using BooksClassLibrary;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
+using static System.Net.Mime.MediaTypeNames;
 
 internal class Program
 {
@@ -11,9 +12,10 @@ internal class Program
         List<BooksClassLibrary.Author> authors = new List<BooksClassLibrary.Author>();
         List<BooksClassLibrary.Publisher> publishers = new List<BooksClassLibrary.Publisher>();
 
-        FileInfo file = new FileInfo("C:\\Users\\vasin\\source\\repos\\bookcatalog\\BookFIle\\books.csv");
+        DateTime publishedDate = new DateTime(1, 1, 1);
+        string file = "C:\\Users\\vasin\\source\\repos\\bookcatalog\\BookFIle\\books.csv";
 
-        using (StreamReader reader = new StreamReader(file.FullName))
+        using (StreamReader reader = new StreamReader(file))
         {
             string line;
             bool isFirstLine = true;
@@ -51,17 +53,31 @@ internal class Program
                     publishers.Add(publisher);
                 }
 
+                if (IsValidDateTime(values[3]))
+                {
+                    publishedDate = DateTime.Parse(values[3]);
+                }
+                else
+                {
+                    publishedDate = new DateTime(1, 1, 1);
+
+                }
+
                 Book book = new Book
-                    (
+                (
                     values[0],
                     int.Parse(values[1]),
                     genre.Id,
                     author.Id,
                     publisher.Id,
-                    DateTime.Parse(values[3])
+                    publishedDate
                 );
-
             }
+        }
+
+        static bool IsValidDateTime(string dateString)
+        {
+            return DateTime.TryParse(dateString, out _);
         }
     }
 }
