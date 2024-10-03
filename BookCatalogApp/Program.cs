@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Reflection.Metadata.BlobBuilder;
+using BookCatalogApp.Resource;
 
 internal class Program
 {
@@ -14,9 +15,21 @@ internal class Program
     {
         try
         {
-            string file = @"..\..\BookFile\books.csv";
-            string filePath = @"..\..\BookFile\filter.json";
+            Console.Write(Resource.EnterFileAdres);
+            string file = Console.ReadLine();
+            Console.Write(Resource.EnterFilterAdres);
+            string filePath = Console.ReadLine();
+
+            if (file == "" )
+            {
+                file = @"..\..\BookFile\books.csv";
+            }
+            if (filePath == "" ) 
+            {
+                filePath = @"..\..\BookFile\filter.json";
+            }
             Filter filter = Filter.LoadFilterSettings(filePath);
+
 
             using (BookCatalogContext context = new BookCatalogContext())
             {
@@ -25,8 +38,8 @@ internal class Program
                 BookSearcher bookSearcher = new BookSearcher(context);
                 List<Book> filteredBooks = bookSearcher.SearchBooks(filter);
 
-                Console.WriteLine($"Books found: {filteredBooks.Count}");
-                Console.WriteLine("List of books:");
+                Console.WriteLine($"{Resource.BooksFound}{filteredBooks.Count}");
+                Console.WriteLine(Resource.ListOfBooks);
                 foreach (var book in filteredBooks)
                 {
                     Console.WriteLine($"- {book.Title}");
@@ -37,7 +50,7 @@ internal class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"{Resource.Error}{ex.Message}");
         }
     }
 }

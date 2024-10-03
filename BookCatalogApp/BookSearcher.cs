@@ -56,7 +56,7 @@ namespace BookCatalogApp
         {
             string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\BookFile");
 
-            string fullPath = Path.Combine(directoryPath, $"Results_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+            string fullPath = Path.Combine(directoryPath, $"Results_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}.csv");
 
             using (var writer = new StreamWriter(fullPath))
             {
