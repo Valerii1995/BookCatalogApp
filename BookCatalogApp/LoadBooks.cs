@@ -47,10 +47,10 @@ namespace BookCatalogApp
                     Publisher publisher = publishers.Find(p => p.Name == publisherName) ?? new Publisher(publisherName);
                     if (!publishers.Contains(publisher)) publishers.Add(publisher);
 
-                    var existingBook = context.Books
-                        .SingleOrDefault(b => b.Title == values[0] && b.AuthorId == author.Id);
-
                     DateTime publisherTime = IsValidDateTime(values[3], lineNumber);
+
+                    Book? existingBook = context.Books
+                         .SingleOrDefault(b => b.Title.Trim() == values[0].Trim() && b.AuthorId == author.Id);
 
                     if (existingBook == null)
                     {

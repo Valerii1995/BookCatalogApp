@@ -12,7 +12,6 @@ namespace BooksClassLibrary
         public Guid Id { get; set; }
         public string Name { get; set; }
 
-        public Genre() { }
         public Genre (string name)
         {
             Id = Guid.NewGuid();

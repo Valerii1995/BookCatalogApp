@@ -20,10 +20,11 @@ namespace BookCatalogApp
 
         public List<Book> SearchBooks(Filter filter)
         {
-            var query = _context.Books.Include(b => b.Genre)
-                                      .Include(b => b.Author)
-                                      .Include(b => b.Publisher)
-                                      .AsQueryable();
+            var query = _context.Books
+                .Include(b => b.Genre)
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(filter.Title))
                 query = query.Where(b => b.Title.Contains(filter.Title));
@@ -60,11 +61,11 @@ namespace BookCatalogApp
 
             using (var writer = new StreamWriter(fullPath))
             {
-                writer.WriteLine("Title,Author,Genre,Publisher,Pages,ReleaseDate");
+                writer.WriteLine("Title,Pages,Genre,ReleaseDate,Author,Publisher");
 
                 foreach (var book in books)
                 {
-                    writer.WriteLine($"{book.Title},{book.Author?.Name},{book.Genre?.Name},{book.Publisher?.Name},{book.Pages},{book.ReleaseDate:yyyy-MM-dd}");
+                    writer.WriteLine($"{book.Title}, {book.Pages}, {book.Genre?.Name}, {book.ReleaseDate:yyyy-MM-dd}, {book.Author?.Name}, {book.Publisher?.Name}");
                 }
             }
         }
