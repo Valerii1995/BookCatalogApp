@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BookCatalogApp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,12 @@ namespace BooksClassLibrary
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+
+        public Author() { }
+        public Author(string name)
+        {
+            Id = Guid.NewGuid();
+            Name = name;
+        }
     }
 }
