@@ -80,8 +80,8 @@ namespace BookCatalogApp
                 }
                 else
                 {
-                    Console.WriteLine($"In line {lineNumber} Incorrect time format: {dateString}");
-                    return DateTime.Parse("1,1,1");
+                    Console.WriteLine($"Error: In line {lineNumber} Incorrect time format: {dateString}");
+                    return DateTime.MinValue;
                 }
             }
         }

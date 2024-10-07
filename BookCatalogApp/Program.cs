@@ -22,14 +22,16 @@ internal class Program
 
             if (file == "" )
             {
-                file = @"..\..\BookFile\books.csv";
+                file = @"..\..\BookFile\books.txt";
             }
             if (filePath == "" ) 
             {
                 filePath = @"..\..\BookFile\filter.json";
             }
-            Filter filter = Filter.LoadFilterSettings(filePath);
 
+
+            Filter filter = Filter.LoadFilterSettings(filePath);
+            string fileExtension = Path.GetExtension(file);
 
             using (BookCatalogContext context = new BookCatalogContext())
             {
@@ -45,10 +47,39 @@ internal class Program
                     Console.WriteLine($"- {book.Title}");
                 }
 
-                bookSearcher.SaveSearchResultsAsCsv(filteredBooks);
+                bookSearcher.SaveSearchResultsAsCsv(filteredBooks, fileExtension);
             }
         }
-        catch (Exception ex)
+        catch (FileNotFoundException ex)
+        {
+            Console.WriteLine($"{Resource.Error} File not found. Details: {ex.Message}");
+            Environment.Exit(1);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            Console.WriteLine($"{Resource.Error} Access denied. Details: {ex.Message}");
+            Environment.Exit(1);
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"{Resource.Error} Invalid JSON format in filter file. Details: {ex.Message}");
+            Environment.Exit(1);
+        }
+        catch (DbUpdateException ex)
+        {
+            Console.WriteLine($"{Resource.Error} Database update failed. Details: {ex.Message}");
+            Environment.Exit(1);
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine($"{Resource.Error} I/O error. Details: {ex.Message}");
+            Environment.Exit(1);
+        }
+        catch (FormatException ex)
+        {
+            Console.WriteLine($"{Resource.Error} Invalid data format. Details: {ex.Message}");
+        }
+        catch (ArgumentException ex)
         {
             Console.WriteLine($"{Resource.Error}{ex.Message}");
         }

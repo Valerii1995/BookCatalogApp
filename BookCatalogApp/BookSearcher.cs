@@ -53,11 +53,11 @@ namespace BookCatalogApp
             return query.ToList();
         }
 
-        public void SaveSearchResultsAsCsv(List<Book> books)
+        public void SaveSearchResultsAsCsv(List<Book> books, string fileExtension)
         {
             string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\BookFile");
 
-            string fullPath = Path.Combine(directoryPath, $"Results_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}.csv");
+            string fullPath = Path.Combine(directoryPath, $"Results_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}{fileExtension}");
 
             using (var writer = new StreamWriter(fullPath))
             {
