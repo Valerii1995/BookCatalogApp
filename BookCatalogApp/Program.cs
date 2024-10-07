@@ -20,18 +20,9 @@ internal class Program
             Console.Write(Resource.EnterFilterAdres);
             string filePath = Console.ReadLine();
 
-            if (file == "" )
-            {
-                file = @"..\..\BookFile\books.txt";
-            }
-            if (filePath == "" ) 
-            {
-                filePath = @"..\..\BookFile\filter.json";
-            }
-
-
             Filter filter = Filter.LoadFilterSettings(filePath);
             string fileExtension = Path.GetExtension(file);
+
 
             using (BookCatalogContext context = new BookCatalogContext())
             {
