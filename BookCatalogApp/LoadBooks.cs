@@ -1,6 +1,9 @@
-﻿using BooksClassLibrary;
+﻿using BookCatalogApp.BooksClassLibrary;
+using BooksClassLibrary;
+using CsvHelper;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,78 +15,77 @@ namespace BookCatalogApp
         public static List<Book> LoadBooksFromCsv(string file, BookCatalogContext context)
         {
             List<Book> books = new List<Book>();
-            List<Genre> genres = new List<Genre>();
-            List<Author> authors = new List<Author>();
-            List<Publisher> publishers = new List<Publisher>();
 
             using (StreamReader reader = new StreamReader(file))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                string line;
-                bool isFirstLine = true;
-                int lineNumber = 0;
+                csv.Context.RegisterClassMap<BookMap>();
 
-                while ((line = reader.ReadLine()) != null)
+                var records = csv.GetRecords<Book>().ToList();
+
+                for (int i = 1; i < records.Count; i++)
                 {
-                    lineNumber++;
+                    Book record = records[i];
 
-                    if (isFirstLine)
+                    if (string.IsNullOrWhiteSpace(record.Genre?.Name) ||
+                         string.IsNullOrWhiteSpace(record.Author?.Name) ||
+                         string.IsNullOrWhiteSpace(record.Publisher?.Name) ||
+                         string.IsNullOrWhiteSpace(record.Title))
                     {
-                        isFirstLine = false;
                         continue;
                     }
 
-                    string[] values = line.Split(',');
+                    DateTime releaseDate = ParseDateOrDefault(record.ReleaseDateString, i);
 
-                    string genreName = values[2];
-                    string authorName = values[3];
-                    string publisherName = values[4];
+                    Genre genre = context.Genres.SingleOrDefault(g => g.Name == record.Genre.Name)
+                        ?? new Genre(record.Genre.Name);
+                    if (genre.Id == Guid.Empty)
+                        context.Genres.Add(genre);
 
-                    Genre genre = genres.Find(g => g.Name == genreName) ?? new Genre(genreName);
-                    if (!genres.Contains(genre)) genres.Add(genre);
+                    Author author = context.Authors.SingleOrDefault(a => a.Name == record.Author.Name)
+                        ?? new Author(record.Author.Name);
+                    if (author.Id == Guid.Empty)
+                        context.Authors.Add(author);
 
-                    Author author = authors.Find(a => a.Name == authorName) ?? new Author(authorName);
-                    if (!authors.Contains(author)) authors.Add(author);
-
-                    Publisher publisher = publishers.Find(p => p.Name == publisherName) ?? new Publisher(publisherName);
-                    if (!publishers.Contains(publisher)) publishers.Add(publisher);
-
-                    DateTime publisherTime = IsValidDateTime(values[3], lineNumber);
+                    Publisher publisher = context.Publishers.SingleOrDefault(p => p.Name == record.Publisher.Name)
+                        ?? new Publisher(record.Publisher.Name);
+                    if (publisher.Id == Guid.Empty)
+                        context.Publishers.Add(publisher);
 
                     Book? existingBook = context.Books
-                         .SingleOrDefault(b => b.Title.Trim() == values[0].Trim() && b.AuthorId == author.Id);
+                        .SingleOrDefault(b => b.Title.Trim() == record.Title.Trim() && b.AuthorId == author.Id);
 
                     if (existingBook == null)
                     {
                         Book book = new Book
                         (
-                            values[0],
-                            int.Parse(values[1]),
+                            record.Title,
+                            record.Pages,
                             genre.Id,
                             author.Id,
                             publisher.Id,
-                            publisherTime
+                            releaseDate
                         );
 
                         context.Books.Add(book);
+                        books.Add(book);
                     }
+
+                    context.SaveChanges();
                 }
             }
 
-            context.SaveChanges();
             return books;
+        }
 
-            static DateTime IsValidDateTime(string dateString, int lineNumber)
+        static DateTime ParseDateOrDefault(string dateString, int lineNumber)
+        {
+            if (DateTime.TryParse(dateString, out DateTime parsedDate))
             {
-                if (DateTime.TryParse(dateString, out _))
-                {
-                    return DateTime.Parse(dateString);
-                }
-                else
-                {
-                    Console.WriteLine($"Error: In line {lineNumber} Incorrect time format: {dateString}");
-                    return DateTime.MinValue;
-                }
+                return parsedDate;
             }
+            Console.WriteLine($"Некорректная дата в строке {lineNumber}: {dateString}. Используем значение по умолчанию: DateTime.MinValue.");
+            return DateTime.MinValue;
         }
     }
 }

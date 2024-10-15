@@ -20,13 +20,24 @@ internal class Program
             Console.Write(Resource.EnterFilterAdres);
             string filePath = Console.ReadLine();
 
+            if (file == "" )
+            { // только для личного пользования /удалить после
+                file = @"..\..\BookFile\books.csv";
+            }
+            if (filePath == "" ) 
+            {
+                filePath = @"..\..\BookFile\filter.json";
+            }
+
+
             Filter filter = Filter.LoadFilterSettings(filePath);
             string fileExtension = Path.GetExtension(file);
-
 
             using (BookCatalogContext context = new BookCatalogContext())
             {
                 List<Book> books = BookLoader.LoadBooksFromCsv(file, context);
+
+
 
                 BookSearcher bookSearcher = new BookSearcher(context);
                 List<Book> filteredBooks = bookSearcher.SearchBooks(filter);
