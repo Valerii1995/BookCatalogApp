@@ -1,4 +1,6 @@
-﻿namespace BooksClassLibrary
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BooksClassLibrary
 {
     public class Book
     {
@@ -9,7 +11,6 @@
         public Guid AuthorId { get; set; }
         public Guid PublisherId { get; set; }
         public DateTime ReleaseDate { get; set; }
-        public string ReleaseDateString { get; set; }
 
         public Genre Genre { get; set; }
         public Author Author { get; set; }

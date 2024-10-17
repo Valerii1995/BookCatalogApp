@@ -20,7 +20,7 @@ namespace BookCatalogApp
 
         public List<Book> SearchBooks(Filter filter)
         {
-            var query = _context.Books
+            IQueryable<Book> query = _context.Books
                 .Include(b => b.Genre)
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)

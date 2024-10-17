@@ -37,8 +37,6 @@ internal class Program
             {
                 List<Book> books = BookLoader.LoadBooksFromCsv(file, context);
 
-
-
                 BookSearcher bookSearcher = new BookSearcher(context);
                 List<Book> filteredBooks = bookSearcher.SearchBooks(filter);
 
